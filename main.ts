@@ -5,13 +5,16 @@ const ENTRY =
 const OUT_DIR = "/output";
 const OUT_FILE = `${OUT_DIR}/entry.txt`;
 
-/** Entry must be 1-159 chars and not blank. Throws on violation. */
+/** Entry must be 1-159 chars, not blank, and have no leading/trailing whitespace. Throws on violation. */
 function validateEntry(entry: string): void {
   if (entry.length < 1 || entry.length > 159) {
     throw new Error(`entry length ${entry.length} outside 1-159`);
   }
   if (entry.trim().length === 0) {
     throw new Error("entry is blank");
+  }
+  if (entry !== entry.trim()) {
+    throw new Error("entry has leading or trailing whitespace");
   }
 }
 
@@ -31,9 +34,13 @@ function selfTest(): void {
   console.log(`self-test OK: ${ENTRY.length} chars, ${actual.length} bytes, byte-identical`);
 }
 
-if (process.argv.includes("--self-test")) {
-  selfTest();
-} else {
-  writeEntry();
-  console.log(`wrote ${ENTRY.length} chars to ${OUT_FILE}`);
+function main(argv: string[]): void {
+  if (argv.includes("--self-test")) {
+    selfTest();
+  } else {
+    writeEntry();
+    console.log(`wrote ${ENTRY.length} chars to ${OUT_FILE}`);
+  }
 }
+
+main(process.argv);
